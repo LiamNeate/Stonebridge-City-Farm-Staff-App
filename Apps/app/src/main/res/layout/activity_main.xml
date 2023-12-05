@@ -9,16 +9,17 @@
     <View
         android:id="@+id/myRectangleView"
         android:layout_width="416dp"
-        android:layout_height="98dp"
+        android:layout_height="88dp"
         android:background="@drawable/rectangle"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/editTextTextEmailAddress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="280dp"
+        android:layout_height="70dp"
         android:layout_marginTop="292dp"
         android:ems="10"
         android:hint="Email"
@@ -43,8 +44,8 @@
 
     <EditText
         android:id="@+id/editTextTextPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="280dp"
+        android:layout_height="70dp"
         android:layout_marginTop="68dp"
         android:ems="10"
         android:hint="Password"
@@ -71,11 +72,10 @@
         android:id="@+id/imageView"
         android:layout_width="86dp"
         android:layout_height="85dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
+        android:layout_marginTop="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.571"
+        app:layout_constraintTop_toTopOf="@+id/myRectangleView"
         app:srcCompat="@drawable/scf_logo" />
 </androidx.constraintlayout.widget.ConstraintLayout>

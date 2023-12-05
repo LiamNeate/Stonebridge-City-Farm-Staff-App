@@ -32,8 +32,8 @@ public class HomePage extends AppCompatActivity {
         }
          */
 
-        TextView textView = (TextView) findViewById(R.id.welcomeMsg);
-        textView.setText("Welcome "+currentUser.getDisplayName());
+        TextView textView = (TextView) findViewById(R.id.usernameMsg);
+        textView.setText(currentUser.getDisplayName());
     }
 
     public void logoutClicked(View view){
