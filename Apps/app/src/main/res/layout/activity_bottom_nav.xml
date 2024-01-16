@@ -51,27 +51,24 @@
         app:layout_constraintTop_toTopOf="@+id/toolbar" />
 
     <LinearLayout
-        android:layout_width="382dp"
-        android:layout_height="457dp"
+        android:layout_width="390dp"
+        android:layout_height="474dp"
         android:orientation="vertical"
         android:weightSum="10"
         app:layout_constraintBottom_toTopOf="@+id/nav_view"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.484"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scfLogo">
+        app:layout_constraintTop_toBottomOf="@+id/scfLogo"
+        app:layout_constraintVertical_bias="1.0">
 
-        <ScrollView
+        <fragment
+            android:id="@+id/nav_host_fragment_activity_bottom_nav"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <fragment
-                android:id="@+id/nav_host_fragment_activity_bottom_nav"
-                android:name="androidx.navigation.fragment.NavHostFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:defaultNavHost="true"
-                app:navGraph="@navigation/mobile_navigation" />
-        </ScrollView>
+            android:layout_height="wrap_content"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/mobile_navigation" />
 
     </LinearLayout>
 

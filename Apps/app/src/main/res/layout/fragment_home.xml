@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/directoryMsg2"
+            android:id="@+id/upcomingShiftsText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -27,8 +27,8 @@
 
         <ScrollView
             android:id="@+id/scrollView2"
-            android:layout_width="fill_parent"
-            android:layout_height="450dp">
+            android:layout_width="match_parent"
+            android:layout_height="402dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
