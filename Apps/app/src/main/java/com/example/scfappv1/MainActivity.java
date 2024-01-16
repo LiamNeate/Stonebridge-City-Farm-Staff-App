@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent = new Intent(MainActivity.this ,HomePage.class);
+            Intent intent = new Intent(MainActivity.this ,BottomNav.class);
             startActivity(intent);
         }
     }
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(MainActivity.this, "Logged in!",
                                     Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(MainActivity.this ,HomePage.class);
+                            Intent intent = new Intent(MainActivity.this ,BottomNav.class);
                             intent.putExtra(emailStr, email);
                             intent.putExtra(pass, password);
                             startActivity(intent);
