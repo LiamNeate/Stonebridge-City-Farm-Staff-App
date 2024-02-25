@@ -24,18 +24,8 @@ public class HomePage extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-
-        /*
-        if (currentUser.getDisplayName() == null){
-            finish();
-            startActivity(getIntent());
-        }
-         */
-
-        TextView textView = (TextView) findViewById(R.id.usernameMsg);
-        textView.setText(currentUser.getDisplayName());
     }
-
+/*
     public void logoutClicked(View view){
         mAuth.signOut();
         finish();
@@ -58,4 +48,6 @@ public class HomePage extends AppCompatActivity {
         finish();
         startActivity(getIntent());
     }
+
+ */
 }

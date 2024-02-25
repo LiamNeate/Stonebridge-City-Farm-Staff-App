@@ -4,140 +4,153 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:weightSum="10"
     tools:context=".HomePage">
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="0dp"
+        android:layout_weight="8"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/button5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/textView2">
 
-        <TextView
-            android:id="@+id/upcomingShiftsText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:paddingBottom="40dp"
-            android:text="Upcoming shifts"
-            android:textAlignment="center"
-            android:textSize="24sp" />
-
-        <ScrollView
-            android:id="@+id/scrollView2"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="402dp">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteX="12dp"
+            tools:layout_editor_absoluteY="199dp">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/todayTextHomePage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                tools:layout_editor_absoluteX="12dp"
-                tools:layout_editor_absoluteY="199dp">
+                android:text="Today" />
 
-                <TextView
-                    android:id="@+id/todayTextHomePage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Today" />
+            <TextView
+                android:id="@+id/todayTimeHomePage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:text="07:00 - 14:00"
+                android:textAlignment="viewStart"
+                android:textSize="48sp" />
 
-                <TextView
-                    android:id="@+id/todayTimeHomePage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
-                    android:text="07:00 - 14:00"
-                    android:textAlignment="viewStart"
-                    android:textSize="48sp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@android:color/darker_gray" />
+            <TextView
+                android:id="@+id/tomorrowTextHomePage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text="Tomorrow" />
 
-                <TextView
-                    android:id="@+id/tomorrowTextHomePage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="10dp"
-                    android:text="Tomorrow" />
+            <TextView
+                android:id="@+id/tomorrowTimeHomePage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:text="10:00 - 17:00"
+                android:textAlignment="viewStart"
+                android:textSize="34sp" />
 
-                <TextView
-                    android:id="@+id/tomorrowTimeHomePage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
-                    android:text="10:00 - 17:00"
-                    android:textAlignment="viewStart"
-                    android:textSize="34sp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@android:color/darker_gray" />
+            <TextView
+                android:id="@+id/thirdDayTextHomePage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text="Friday 13th October" />
 
-                <TextView
-                    android:id="@+id/thirdDayTextHomePage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="10dp"
-                    android:text="Friday 13th October" />
+            <TextView
+                android:id="@+id/thirdDayTimeHomePage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:text="OFF"
+                android:textAlignment="viewStart"
+                android:textSize="34sp" />
 
-                <TextView
-                    android:id="@+id/thirdDayTimeHomePage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
-                    android:text="OFF"
-                    android:textAlignment="viewStart"
-                    android:textSize="34sp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@android:color/darker_gray" />
+            <TextView
+                android:id="@+id/forthDayTextHomePage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text="Saturday 14th October" />
 
-                <TextView
-                    android:id="@+id/forthDayTextHomePage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="10dp"
-                    android:text="Saturday 14th October" />
+            <TextView
+                android:id="@+id/forthDayTimeHomePage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:text="OFF"
+                android:textAlignment="viewStart"
+                android:textSize="34sp" />
 
-                <TextView
-                    android:id="@+id/forthDayTimeHomePage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
-                    android:text="OFF"
-                    android:textAlignment="viewStart"
-                    android:textSize="34sp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@android:color/darker_gray" />
+            <TextView
+                android:id="@+id/fifthDayTextHomePage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text="Sunday 15th October" />
 
-                <TextView
-                    android:id="@+id/fifthDayTextHomePage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="10dp"
-                    android:text="Sunday 15th October" />
+            <TextView
+                android:id="@+id/fifthDayTimeHomePage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:text="09:00 - 18:00"
+                android:textAlignment="viewStart"
+                android:textSize="34sp" />
 
-                <TextView
-                    android:id="@+id/fifthDayTimeHomePage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
-                    android:text="09:00 - 18:00"
-                    android:textAlignment="viewStart"
-                    android:textSize="34sp" />
+        </LinearLayout>
+    </ScrollView>
 
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="176dp"
+        android:layout_height="59dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:text="Clock In/Out"
+        android:backgroundTint="@color/button_dark_back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:text="Upcoming Shifts"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
