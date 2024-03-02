@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("diaryDesc", "");
                         intent.putExtra("diarySig", "");
                         intent.putExtra("diaryImgPath", "");
+                        intent.putExtra("diaryEmail", "");
                         startActivity(intent);
                     }
                     else{

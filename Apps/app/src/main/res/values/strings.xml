@@ -8,7 +8,7 @@
     <string name="title_acc">Account</string>
     <string name="title_addUsr">Add User</string>
     <string name="title_editShifts">Edit shifts</string>
-    <string name="title_addDiaryEntry">Add entry</string>
+    <string name="title_addDiaryEntry">Entry</string>
     <string name="user_placeholder">User</string>
     <string name="load">Loading...</string>
     <string-array name="user">

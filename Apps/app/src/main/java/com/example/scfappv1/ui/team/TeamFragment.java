@@ -126,7 +126,7 @@ public class TeamFragment extends Fragment {
                             newLineLayout.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    openAccount(item.getData().get("username").toString(), item.getId());
+                                    openAccount(item.getId().toString(), item.getId());
                                 }
                             });
 
@@ -141,7 +141,7 @@ public class TeamFragment extends Fragment {
                             profilePic.setLayoutParams(profileParams);
 
                             //Setting the user profile picture with the one on the database
-                            getUserImage(item.getData().get("username").toString(), profilePic);
+                            getUserImage(item.getId(), profilePic);
 
                             //Setting image in container
                             imageLayout.addView(profilePic);

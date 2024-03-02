@@ -51,6 +51,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
@@ -67,6 +68,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -91,16 +93,19 @@ public class AddDiaryEntryFragment extends Fragment {
     public MaterialButton submit;
     public MaterialButton camera;
     public TextView imgTxt;
+    public File imageFile;
+    public File downloadsDirectory;
+    public boolean hasImage = false;
+    public boolean preExisted = false;
+    public String diaryDate;
+    public String usrDiaryEntry;
+    public String diaryEmail;
 
     //Camera features
     private CameraDevice cameraDevice;
     private CameraCaptureSession cameraCaptureSession;
     private ImageReader imageReader;
     private TextureView textureView;
-    public StorageReference storageRef;
-    public ImageView tempProfile;
-    public File imageFile;
-    public File downloadsDirectory;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -110,6 +115,11 @@ public class AddDiaryEntryFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        //Setting up the camera features
+        //Setting up the texture view
+        textureView = getView().findViewById(R.id.textureView);
+        textureView.setSurfaceTextureListener(surfaceTextureListener);
+
         //Getting the post fields
         titleField = getActivity().findViewById(R.id.title);
         descField = getActivity().findViewById(R.id.desc);
@@ -151,8 +161,6 @@ public class AddDiaryEntryFragment extends Fragment {
         camera.setVisibility(View.GONE);
 
         //Making new elements visible
-        ConstraintLayout newConstLay = getActivity().findViewById(R.id.textureViewLayout);
-        newConstLay.setVisibility(View.VISIBLE);
         TextView sigView = getActivity().findViewById(R.id.sigText);
         sigView.setVisibility(View.VISIBLE);
 
@@ -177,6 +185,7 @@ public class AddDiaryEntryFragment extends Fragment {
 
         //Getting and setting the diary image if there is one
         if (!intent.getStringExtra("diaryImgPath").isEmpty()) {
+            hasImage = true;
             ImageView postImgView = getActivity().findViewById(R.id.postImg);
             postImgView.setVisibility(View.VISIBLE);
 
@@ -202,6 +211,14 @@ public class AddDiaryEntryFragment extends Fragment {
                                         @Override
                                         public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                                             //Getting image inside of bitmap variable
+                                            downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                                            imageFile = new File(downloadsDirectory, "diaryImg.jpg");
+                                            FileOutputStream fOut;
+                                            try {
+                                                fOut = new FileOutputStream(imageFile);
+                                            } catch (FileNotFoundException e) {
+                                                throw new RuntimeException(e);
+                                            }
                                             Bitmap bitmap = BitmapFactory.decodeFile(localfile.getAbsolutePath());
                                             Log.d(TAG, "HERE1");
                                             //Rotating the image as it comes in sideways
@@ -213,6 +230,12 @@ public class AddDiaryEntryFragment extends Fragment {
                                             } catch (Exception e) {
                                                 Log.d(TAG, "Error: " + e);
                                             }
+                                            rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                                            rmv.setTextColor(getActivity().getResources().getColor(R.color.button_dark_back));
+                                            rmv.setClickable(true);
+                                            TextView imgAddedTxt = imgTxt;
+                                            imgAddedTxt.setText("Image added!");
+                                            imgAddedTxt.setTag("full");
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
@@ -228,6 +251,49 @@ public class AddDiaryEntryFragment extends Fragment {
                 }
             });
         }
+        //Setting up fabs if this is the users post
+        if (intent.getStringExtra("diaryEmail").equals(intent.getStringExtra("email"))){
+            FloatingActionButton editEntry = getActivity().findViewById(R.id.editFab);
+            FloatingActionButton delEntry = getActivity().findViewById(R.id.deleteFab);
+            editEntry.setVisibility(View.VISIBLE);
+            delEntry.setVisibility(View.VISIBLE);
+            editEntry.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (hasImage) {
+                        View postImgView = getActivity().findViewById(R.id.postImg);
+                        postImgView.setVisibility(View.GONE);
+                    }
+                    //Setting new entry elements back to visible
+                    submit.setVisibility(View.VISIBLE);
+                    rmv.setVisibility(View.VISIBLE);
+                    imgTxt.setVisibility(View.VISIBLE);
+                    camera.setVisibility(View.VISIBLE);
+
+                    //Reverting new elements to invisible
+                    sigView.setVisibility(View.GONE);
+                    editEntry.setVisibility(View.GONE);
+                    delEntry.setVisibility(View.GONE);
+
+                    //Making the edit fields editable
+                    descField.setFocusable(true);
+                    descField.setFocusableInTouchMode(true);
+                    descField.setClickable(true);
+
+                    titleField.setFocusable(true);
+                    titleField.setFocusableInTouchMode(true);
+                    titleField.setClickable(true);
+
+                    //Setting the function to say this item already exists in the db
+                    preExisted = true;
+                    addEntry();
+                }
+            });
+        }
+
+        diaryEmail = intent.getStringExtra("diaryEmail");
+        usrDiaryEntry = intent.getStringExtra("diaryEntry");
+        diaryDate = intent.getStringExtra("diaryDate");
 
         //Setting all intent values back to blank
         intent.putExtra("diaryTitle", "");
@@ -245,10 +311,22 @@ public class AddDiaryEntryFragment extends Fragment {
             }
         });
 
+        rmv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imageFile.delete();
+                imgTxt.setTag("empty");
+                imgTxt.setText("No image taken");
+            }
+        });
+
         //Adding an on click to open the camera preview
         camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Setting up the camera features
+                //Setting up the texture view
+                textureView.setSurfaceTextureListener(surfaceTextureListener);
                 if (getActivity().getApplicationContext().getPackageManager().hasSystemFeature(
                         PackageManager.FEATURE_CAMERA)) {
                     //Function to make the camera elements invisible or visible
@@ -258,11 +336,6 @@ public class AddDiaryEntryFragment extends Fragment {
                 }
             }
         });
-
-        //Setting up the camera features
-        //Setting up the texture view
-        textureView = getView().findViewById(R.id.textureView);
-        textureView.setSurfaceTextureListener(surfaceTextureListener);
 
         //Adding on clicks to the button
         cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -359,7 +432,7 @@ public class AddDiaryEntryFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 Log.w(TAG, "HERE1: " + diaryEntry);
-                if (!task.getResult().isEmpty()) {
+                if (!task.getResult().isEmpty() && !preExisted) {
                     getLatestDocVal(db, date, diaryEntryInt+1);
                 } else {
                     createNewEntry(db, date, diaryEntry);
@@ -377,7 +450,7 @@ public class AddDiaryEntryFragment extends Fragment {
         //Getting the username for the signature as well as the email for the db
         Intent intent = getActivity().getIntent();
         //Creating the signature
-        String sig = (intent.getStringExtra("firstName") + " " + intent.getStringExtra("lastName             ").substring(0,1) + ".");
+        String sig = (intent.getStringExtra("firstName") + " " + intent.getStringExtra("lastName").substring(0,1) + ".");
         //adding to map
         newMap.put("sig", sig);
 
@@ -387,6 +460,12 @@ public class AddDiaryEntryFragment extends Fragment {
         //Adding the current timestamp
         Timestamp time = new Timestamp(today);
         newMap.put("time", time);
+
+        if (preExisted){
+            date = diaryDate;
+            email = diaryEmail;
+            diaryEntry = usrDiaryEntry;
+        }
 
         //Setting to db
         db.collection("diaryEntries").document(date).collection(diaryEntry).document(email)
@@ -465,7 +544,7 @@ public class AddDiaryEntryFragment extends Fragment {
                     buffer.get(bytes);
                     output.write(bytes);
                     Toast.makeText(getActivity(), "Image saved!", Toast.LENGTH_SHORT).show();
-                    textureView.setVisibility(View.GONE);
+                    //textureView.setVisibility(View.GONE);
                     rmv.setTextColor(getActivity().getResources().getColor(R.color.button_dark_back));
                     rmv.setClickable(true);
                     TextView imgAddedTxt = imgTxt;

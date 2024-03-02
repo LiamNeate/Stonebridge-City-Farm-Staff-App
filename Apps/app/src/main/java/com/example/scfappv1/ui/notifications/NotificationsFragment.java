@@ -182,10 +182,11 @@ private FragmentNotificationsBinding binding;
                         String desc = doc.getString("desc");
                         //Timestamp time = doc.getTimestamp("time");
                         String sig = doc.getString("sig");
+                        String email = doc.getId();
                         String userFirstLetter = (doc.getString("sig")).substring(0, 1);
                         //Getting the first letter of the users name for the user icon
                         try{
-                            displayData(title, desc, sig, userFirstLetter, date, diaryEntry);
+                            displayData(title, desc, sig, userFirstLetter, email, date, diaryEntry);
                         } catch (Exception e){
                             Log.w(TAG, "Error: ", e);
                         }
@@ -196,7 +197,7 @@ private FragmentNotificationsBinding binding;
         });
     }
 
-    public void displayData(String title, String desc, String sig, String userLetter, String date, String diaryEntry){
+    public void displayData(String title, String desc, String sig, String userLetter, String email, String date, String diaryEntry){
 
         Log.d(TAG, "HER");
         //Getting the existing linear layout to find the width of the device
@@ -228,6 +229,9 @@ private FragmentNotificationsBinding binding;
                 intent.putExtra("diaryTitle", title);
                 intent.putExtra("diaryDesc", desc);
                 intent.putExtra("diarySig", sig);
+                intent.putExtra("diaryEmail", email);
+                intent.putExtra("diaryDate", date);
+                intent.putExtra("diaryEntry", diaryEntry);
                 intent.putExtra("diaryImgPath", "diary/diary_imgs/" + date + "/" + diaryEntry);
                 NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_bottom_nav);
                 navController.navigate(R.id.navigation_add_diary_entry);
