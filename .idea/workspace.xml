@@ -4,7 +4,18 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="c5530775-5bbb-476e-9efc-2f86a9108a82" name="Changes" comment="" />
+=======
+    <list default="true" id="22f3ff69-0cbf-48bc-9320-ac54788b3668" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Apps/app/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Apps/app/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Apps/app/.idea/migrations.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Apps/app/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Apps/app/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+>>>>>>> b246fd41548ebd0665c1b4407afef718c06bec38
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -34,11 +45,15 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "git-widget-placeholder": "app-v1",
+<<<<<<< HEAD
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/LiamN/StudioProjects/Stonebridge-City-Farm-Staff-App/Apps",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.0"
+=======
+    "last_opened_file_path": "C:/Users/LiamN/Documents/GitHub/Stonebridge-City-Farm-Staff-App"
+>>>>>>> b246fd41548ebd0665c1b4407afef718c06bec38
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
