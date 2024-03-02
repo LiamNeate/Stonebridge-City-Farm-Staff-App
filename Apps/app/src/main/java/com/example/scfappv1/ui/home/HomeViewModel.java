@@ -13,6 +13,7 @@ public class HomeViewModel extends ViewModel {
         mText.setValue("Home");
     }
 
+
     public LiveData<String> getText() {
         return mText;
     }

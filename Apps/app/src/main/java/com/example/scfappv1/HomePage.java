@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class HomePage extends AppCompatActivity {
 
@@ -17,13 +19,24 @@ public class HomePage extends AppCompatActivity {
 
     public FirebaseUser currentUser;
 
+    public TextView todayTime;
+    public TextView test;
+
+    public String username;
+
+    FirebaseDatabase rootNode;
+    DatabaseReference reference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
-
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
+        test = findViewById(R.id.textView2);
+        Intent intent = getIntent();
+        test.setText(intent.getStringExtra("username"));
+        test.setText("TEST");
     }
 /*
     public void logoutClicked(View view){

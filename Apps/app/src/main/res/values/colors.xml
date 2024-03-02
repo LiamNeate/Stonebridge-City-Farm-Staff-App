@@ -4,4 +4,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="scf">#FFD8E7</color>
     <color name="button_dark_back">#95416C</color>
+    <color name="button_greyed_out">#D0D0D0</color>
+    <color name="diary_btn">#FEF7FF</color>
+    <color name="diary_btn_outline">#CAC4D0</color>
+    <color name="diary_btn_pink">#FED9E6</color>
+    <color name="card_colour">#F7F2FA</color>
 </resources>

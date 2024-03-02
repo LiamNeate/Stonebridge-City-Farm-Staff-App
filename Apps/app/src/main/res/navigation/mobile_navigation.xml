@@ -15,7 +15,7 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.example.scfappv1.ui.dashboard.DashboardFragment"
         android:label="@string/title_calendar"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_notifications"
@@ -24,8 +24,38 @@
         tools:layout="@layout/fragment_notifications" />
 
     <fragment
+        android:id="@+id/navigation_team"
+        android:name="com.example.scfappv1.ui.team.TeamFragment"
+        android:label="@string/title_team"
+        android:visibility="invisible"
+        tools:layout="@layout/fragment_team" />
+
+    <fragment
         android:id="@+id/navigation_account"
         android:name="com.example.scfappv1.ui.account.AccountFragment"
-        android:label="Account"
+        android:label="@string/title_acc"
+        android:visibility="invisible"
         tools:layout="@layout/fragment_account" />
+
+    <fragment
+        android:id="@+id/navigation_add_user"
+        android:name="com.example.scfappv1.ui.addUser.AddUserFragment"
+        android:label="@string/title_addUsr"
+        android:visibility="invisible"
+        tools:layout="@layout/fragment_add_user" />
+
+    <fragment
+        android:id="@+id/navigation_edit_shift"
+        android:name="com.example.scfappv1.ui.editShift.EditShiftFragment"
+        android:label="@string/title_editShifts"
+        android:visibility="invisible"
+        tools:layout="@layout/fragment_add_user" />
+
+    <fragment
+        android:id="@+id/navigation_add_diary_entry"
+        android:name="com.example.scfappv1.ui.addDiaryEntry.AddDiaryEntryFragment"
+        android:label="@string/title_addDiaryEntry"
+        android:visibility="invisible"
+        tools:layout="@layout/fragment_add_diary_entry"/>
+
 </navigation>

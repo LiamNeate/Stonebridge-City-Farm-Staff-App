@@ -7,19 +7,60 @@
     android:weightSum="10"
     tools:context=".HomePage">
 
-    <ScrollView
-        android:id="@+id/scrollView2"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/nfcView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:alignItems="center"
+            app:flexWrap="wrap"
+            app:flexDirection="column"
+            app:justifyContent="space_around">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="25dp"
+                android:text="Please scan the clock in/out tag"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNFCContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="25dp"
+                android:text=""/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancelClockBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Cancel"
+                android:backgroundTint="@color/button_dark_back"/>
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/mainScroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="8"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/button5"
+        android:layout_weight="8"
+        app:layout_constraintBottom_toTopOf="@+id/clockInOutBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2">
+        app:layout_constraintTop_toBottomOf="@+id/homeText">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,7 +80,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="10dp"
-                android:text="07:00 - 14:00"
+                android:text="@string/load"
                 android:textAlignment="viewStart"
                 android:textSize="48sp" />
 
@@ -60,7 +101,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="10dp"
-                android:text="10:00 - 17:00"
+                android:text="@string/load"
                 android:textAlignment="viewStart"
                 android:textSize="34sp" />
 
@@ -74,14 +115,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="10dp"
-                android:text="Friday 13th October" />
+                android:text="@string/load" />
 
             <TextView
                 android:id="@+id/thirdDayTimeHomePage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="10dp"
-                android:text="OFF"
+                android:text="@string/load"
                 android:textAlignment="viewStart"
                 android:textSize="34sp" />
 
@@ -95,14 +136,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="10dp"
-                android:text="Saturday 14th October" />
+                android:text="@string/load" />
 
             <TextView
                 android:id="@+id/forthDayTimeHomePage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="10dp"
-                android:text="OFF"
+                android:text="@string/load"
                 android:textAlignment="viewStart"
                 android:textSize="34sp" />
 
@@ -116,22 +157,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="10dp"
-                android:text="Sunday 15th October" />
+                android:text="@string/load" />
 
             <TextView
                 android:id="@+id/fifthDayTimeHomePage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="10dp"
-                android:text="09:00 - 18:00"
+                android:text="@string/load"
                 android:textAlignment="viewStart"
                 android:textSize="34sp" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-    <Button
-        android:id="@+id/button5"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/clockInOutBtn"
         android:layout_width="176dp"
         android:layout_height="59dp"
         android:layout_marginBottom="10dp"
@@ -142,8 +183,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/textView2"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/homeText"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
