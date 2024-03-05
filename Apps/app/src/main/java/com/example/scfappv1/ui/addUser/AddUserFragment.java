@@ -1,5 +1,6 @@
 package com.example.scfappv1.ui.addUser;
 
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.text.InputType;
@@ -30,6 +31,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.Timestamp;
@@ -37,12 +39,16 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class AddUserFragment extends Fragment {
@@ -58,6 +64,7 @@ public class AddUserFragment extends Fragment {
     public AutoCompleteTextView rolesView;
     public AutoCompleteTextView teamsView;
     public DatePicker dobPicker;
+    public boolean isVisiting;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -96,8 +103,10 @@ public class AddUserFragment extends Fragment {
         //Setting array adapters of the string arrays and then setting them to the drop down menus
         ArrayAdapter<String> rolesAdapter = new ArrayAdapter<>(getActivity(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, rolesArr);
         rolesView.setAdapter(rolesAdapter);
+        rolesView.setThreshold(100);
         ArrayAdapter<String> teamsAdapter = new ArrayAdapter<>(getActivity(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, teamsArr);
         teamsView.setAdapter(teamsAdapter);
+        teamsView.setThreshold(100);
 
         //Getting the create user button
         Button createUsr = getView().findViewById(R.id.createUsrBtnConf);
@@ -110,6 +119,52 @@ public class AddUserFragment extends Fragment {
                 submitFields();
             }
         });
+
+        //Checking if the user wants to edit an existing user
+        Intent intent = getActivity().getIntent();
+        String userEmail = intent.getStringExtra("usrEmail");
+        if(!userEmail.equals("")){
+            // Create a storage reference from our app
+            intent.putExtra("usrEmail", "");
+            isVisiting = true;
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference users = db.collection("username").document(userEmail);
+            users.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        //Setting the text fields with the existing information
+                        firstName.setText(document.getString("firstName"));
+                        secondName.setText(document.getString("lastName"));
+                        TextInputLayout emailLayout = getActivity().findViewById(R.id.addEmailLayout);
+                        emailLayout.setHint(document.getId());
+                        teamsView.setText(document.getString("team"));
+                        rolesView.setText(document.getString("role"));
+
+                        //Set password field as disabled
+                        emailField.setEnabled(false);
+                        passwordField.setEnabled(false);
+                        confPasswordField.setEnabled(false);
+                        emailField.setBackgroundColor(getResources().getColor(R.color.button_greyed_out));
+                        passwordField.setBackgroundColor(getResources().getColor(R.color.button_greyed_out));
+                        confPasswordField.setBackgroundColor(getResources().getColor(R.color.button_greyed_out));
+
+                        Button update = getActivity().findViewById(R.id.createUsrBtnConf);
+                        update.setText("Update account");
+
+                        Timestamp dateTS = document.getTimestamp("DOB");
+                        Date date = new Date(dateTS.toDate().getTime());
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                        String dateNoChanged = sdf.format(date);
+                        int day = Integer.valueOf(dateNoChanged.substring(0,2));
+                        int month = Integer.valueOf(dateNoChanged.substring(3,5));
+                        int year = Integer.valueOf(dateNoChanged.substring(6,10));
+                        dobPicker.updateDate(year, month-1, day);
+                    }
+                }
+            });
+        }
     }
 
     public void submitFields(){
@@ -140,16 +195,16 @@ public class AddUserFragment extends Fragment {
             Toast.makeText(getActivity(), "Please enter a first name.", Toast.LENGTH_SHORT).show();
         } else if (TextUtils.isEmpty(sName)){
             Toast.makeText(getActivity(), "Please enter a second name.", Toast.LENGTH_SHORT).show();
-        } else if (TextUtils.isEmpty(email)){
+        } else if (TextUtils.isEmpty(email) && !isVisiting){
             Toast.makeText(getActivity(), "Please enter an email address.", Toast.LENGTH_SHORT).show();
         } else if (TextUtils.isEmpty(role)){
             Toast.makeText(getActivity(), "Please select a role.", Toast.LENGTH_SHORT).show();
         } else if (TextUtils.isEmpty(team)){
             Toast.makeText(getActivity(), "Please select a team.", Toast.LENGTH_SHORT).show();
-        } else if (!email.contains("@") || !email.contains(".")){
+        } else if ((!email.contains("@") || !email.contains(".")) && !isVisiting){
             Toast.makeText(getActivity(), "Please enter a valid email.", Toast.LENGTH_SHORT).show();
         }
-        else if (!password.equals(confPassword)){
+        else if (!password.equals(confPassword) && !isVisiting){
             Toast.makeText(getActivity(), "Passwords do not match.", Toast.LENGTH_SHORT).show();
             Toast.makeText(getActivity(), password +":"+confPassword, Toast.LENGTH_SHORT).show();
         }
@@ -195,6 +250,7 @@ public class AddUserFragment extends Fragment {
             newUserMap.put("team", team);
             newUserMap.put("username", email);
             newUserMap.put("clockedIn", false);
+            newUserMap.put("deleted", false);
 
             //Adding to db
             db.collection("username").document(email)

@@ -184,7 +184,6 @@ private FragmentNotificationsBinding binding;
         diaryCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                Log.w(TAG, "HERE1: " + diaryEntry);
                 if (task.isSuccessful() && !task.getResult().isEmpty()) {
                     for (QueryDocumentSnapshot doc : task.getResult()) {
                         Boolean deleted = doc.getBoolean("deleted");

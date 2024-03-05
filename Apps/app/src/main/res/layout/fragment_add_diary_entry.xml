@@ -28,10 +28,12 @@
             android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="300dp"
+                android:minHeight="150dp"
                 android:backgroundTint="@color/card_colour"
+                android:layout_marginBottom="50dp"
                 app:cardCornerRadius="20dp">
 
                 <com.google.android.flexbox.FlexboxLayout
@@ -54,7 +56,8 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/desc"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
+                        android:layout_height="match_parent"
+                        android:minHeight="50dp"
                         android:gravity="top"
                         android:hint="Description..."
                         android:inputType="textCapSentences|textMultiLine"
@@ -62,17 +65,34 @@
                         android:layout_marginTop="20dp"
                         android:background="@null"/>
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/postImg"
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:id="@+id/loadingCirc"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"/>
+                        android:indeterminate="true"
+                        android:visibility="gone"
+                        app:layout_alignSelf="center" />
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/postImg"
+                            android:paddingTop="20dp"
+                            android:paddingBottom="20dp"
+                            android:layout_height="500dp"
+                            android:layout_width="match_parent"
+                            android:scaleType="centerCrop"
+                            android:visibility="gone"/>
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/sigText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         android:textAlignment="textEnd"/>
 
                 </com.google.android.flexbox.FlexboxLayout>
@@ -86,7 +106,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_marginTop="40dp"
                 android:text="Add an image"
                 android:textColor="@color/button_dark_back"
                 app:layout_constraintBottom_toTopOf="@+id/appCompatTextView"

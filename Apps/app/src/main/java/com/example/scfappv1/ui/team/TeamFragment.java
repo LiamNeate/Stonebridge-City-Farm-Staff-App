@@ -208,7 +208,7 @@ public class TeamFragment extends Fragment {
                                 }
                             });
 
-                            if (item.getId().toString().contains(email)){
+                            if (item.getId().contains(email)){
                                 remove.getBackground().setTint(getActivity().getResources().getColor(R.color.button_greyed_out));
                                 remove.setOnClickListener(new View.OnClickListener() {
                                     @Override
@@ -227,6 +227,14 @@ public class TeamFragment extends Fragment {
                             editParams.weight = 1.0f;
                             editParams.gravity = Gravity.CENTER;
                             edit.setLayoutParams(editParams);
+                            edit.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    intent.putExtra("usrEmail", item.getId());
+                                    NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_bottom_nav);
+                                    navController.navigate(R.id.navigation_add_user);
+                                }
+                            });
 
                             //Adding it all together
                             //Adding the items to the links layout

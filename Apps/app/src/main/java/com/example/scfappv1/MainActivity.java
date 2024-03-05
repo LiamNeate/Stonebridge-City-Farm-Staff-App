@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
     public final static String adminStr = "admin";
     public final static String fNameStr = "firstName";
     public final static String lNameStr = "lastName";
-    private static final String TAG = "DocSnippets";
+    public final static String usrEmail = "usrEmail";
+    private static final String TAG = "Testing";
     private FirebaseAuth mAuth;
     private DatabaseReference reference;
 
@@ -63,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
         if(currentUser != null){
             if (isBiometricAvailable()){
                 showBiometricPrompt();
+            } else {
+                String email = mAuth.getCurrentUser().getEmail();
+                setIntent(email);
             }
         }
     }
@@ -153,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra(adminStr, admin);
                         intent.putExtra(fNameStr, fName);
                         intent.putExtra(lNameStr, lName);
+                        intent.putExtra(usrEmail, "");
                         startActivity(intent);
                     }
                     else{

@@ -1,5 +1,6 @@
 package com.example.scfappv1.ui.addDiaryEntry;
 
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -59,6 +60,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
@@ -202,15 +204,17 @@ public class AddDiaryEntryFragment extends Fragment {
         titleField.setText(intent.getStringExtra("diaryTitle"));
         descField.setText(intent.getStringExtra("diaryDesc"));
         sigView.setText("By "+intent.getStringExtra("diarySig"));
+        CircularProgressIndicator loadingCirc = getActivity().findViewById(R.id.loadingCirc);
 
         //Getting and setting the diary image if there is one
         if (!intent.getStringExtra("diaryImgPath").isEmpty()) {
-            hasImage = true;
+            loadingCirc.setVisibility(View.VISIBLE);
             ImageView postImgView = getActivity().findViewById(R.id.postImg);
-            postImgView.setVisibility(View.VISIBLE);
 
             //Getting the string for image location
             String imgLocation = intent.getStringExtra("diaryImgPath");
+            //Resetting intent string
+            intent.putExtra("diaryImgPath", "");
             // Create a storage reference from our app
             FirebaseStorage storage = FirebaseStorage.getInstance();
             // Create a child reference
@@ -220,52 +224,60 @@ public class AddDiaryEntryFragment extends Fragment {
                 @Override
                 public void onSuccess(ListResult listResult) {
                     //Looping through the results although their should only be one
-                    for (StorageReference item : listResult.getItems()) {
-                        //Getting the name of the image and getting the path from that
-                        Log.d(TAG, imgLocation);
-                        StorageReference storageReference = FirebaseStorage.getInstance().getReference(imgLocation+"/"+item.getName());
-                        try {
-                            File localfile = File.createTempFile("tempfile", ".jpg");
-                            storageReference.getFile(localfile)
-                                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                        @Override
-                                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                            //Getting image inside of bitmap variable
-                                            downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                                            imageFile = new File(downloadsDirectory, "diaryImg.jpg");
-                                            FileOutputStream fOut;
-                                            try {
-                                                fOut = new FileOutputStream(imageFile);
-                                            } catch (FileNotFoundException e) {
-                                                throw new RuntimeException(e);
+                    if (listResult.getItems().isEmpty()){
+                        loadingCirc.setVisibility(View.GONE);
+                    } else {
+                        for (StorageReference item : listResult.getItems()) {
+                            //Getting the name of the image and getting the path from that
+                            Log.d(TAG, imgLocation);
+                            StorageReference storageReference = FirebaseStorage.getInstance().getReference(imgLocation + "/" + item.getName());
+                            try {
+                                File localfile = File.createTempFile("tempfile", ".jpg");
+                                storageReference.getFile(localfile)
+                                        .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                                postImgView.setVisibility(View.VISIBLE);
+                                                //Getting image inside of bitmap variable
+                                                downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                                                imageFile = new File(downloadsDirectory, "diaryImg.jpg");
+                                                FileOutputStream fOut;
+                                                try {
+                                                    fOut = new FileOutputStream(imageFile);
+                                                } catch (FileNotFoundException e) {
+                                                    throw new RuntimeException(e);
+                                                }
+                                                Bitmap bitmap = BitmapFactory.decodeFile(localfile.getAbsolutePath());
+                                                //Rotating the image as it comes in sideways
+                                                Matrix matrix = new Matrix();
+                                                matrix.postRotate(180);
+                                                Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                                                try {
+                                                    postImgView.setImageBitmap(rotatedBitmap);
+                                                } catch (Exception e) {
+                                                    Log.d(TAG, "Error: " + e);
+                                                }
+                                                rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                                                rmv.setTextColor(getActivity().getResources().getColor(R.color.button_dark_back));
+                                                rmv.setClickable(true);
+                                                TextView imgAddedTxt = imgTxt;
+                                                imgAddedTxt.setText("Image added!");
+                                                imgAddedTxt.setTag("full");
+                                                loadingCirc.setVisibility(View.GONE);
+                                                hasImage = true;
                                             }
-                                            Bitmap bitmap = BitmapFactory.decodeFile(localfile.getAbsolutePath());
-                                            //Rotating the image as it comes in sideways
-                                            Matrix matrix = new Matrix();
-                                            matrix.postRotate(180);
-                                            Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                                            try{
-                                                postImgView.setImageBitmap(rotatedBitmap);
-                                            } catch (Exception e) {
-                                                Log.d(TAG, "Error: " + e);
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.w(TAG, "Error here: ", e);
                                             }
-                                            rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-                                            rmv.setTextColor(getActivity().getResources().getColor(R.color.button_dark_back));
-                                            rmv.setClickable(true);
-                                            TextView imgAddedTxt = imgTxt;
-                                            imgAddedTxt.setText("Image added!");
-                                            imgAddedTxt.setTag("full");
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w(TAG, "Error here: ", e);
-                                        }
-                                    });
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
+                                        });
+                            } catch (IOException e) {
+                                loadingCirc.setVisibility(View.GONE);
+                                throw new RuntimeException(e);
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
             });
@@ -568,7 +580,12 @@ public class AddDiaryEntryFragment extends Fragment {
         }
         //Creating the users name for the notification
         String name = (intent.getStringExtra("firstName") + " " + intent.getStringExtra("lastName"));
-        ((BottomNav)getActivity()).handleNotifications("New diary entry!","A new diary entry has been created by "+name+" about '"+title+"'.");
+        if (preExisted){
+            ((BottomNav)getActivity()).handleNotifications("A diary entry has been updated.","A new diary entry has been created by "+name+" titled: '"+title+"'.");
+        }
+        else{
+            ((BottomNav)getActivity()).handleNotifications("New diary entry.","A new diary entry has been created by "+name+" titled: '"+title+"'.");
+        }
         getActivity().onBackPressed();
     }
 

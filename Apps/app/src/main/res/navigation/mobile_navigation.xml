@@ -40,7 +40,7 @@
     <fragment
         android:id="@+id/navigation_add_user"
         android:name="com.example.scfappv1.ui.addUser.AddUserFragment"
-        android:label="@string/title_addUsr"
+        android:label="User"
         android:visibility="invisible"
         tools:layout="@layout/fragment_add_user" />
 

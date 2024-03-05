@@ -141,6 +141,7 @@ public class AccountFragment extends Fragment {
         btnLayout = getView().findViewById(R.id.btnLayout);
         Button captureButton = getView().findViewById(R.id.btnCapture);
         Button cancelButton = getView().findViewById(R.id.btnCancel);
+        Button editProfile = getView().findViewById(R.id.editProfileBtn);
         scrollView = getView().findViewById(R.id.scrollView2);
         constLayout = getView().findViewById(R.id.textureViewLayout);
         textureView = getView().findViewById(R.id.textureView);
@@ -157,6 +158,14 @@ public class AccountFragment extends Fragment {
                 } else {
                     Toast.makeText(getActivity(), "Missing permissions to access the front camera", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+        editProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                intent.putExtra("usrEmail", email);
+                NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_activity_bottom_nav);
+                navController.navigate(R.id.navigation_add_user);
             }
         });
         cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -327,6 +336,7 @@ public class AccountFragment extends Fragment {
         Button setShiftPattern = getView().findViewById(R.id.shiftPatternBtn);
         if (!adminBool){
             setShiftPattern.setVisibility(View.GONE);
+            editProfile.setVisibility(View.GONE);
         }
         setShiftPattern.setOnClickListener(new View.OnClickListener() {
             @Override
