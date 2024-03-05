@@ -2,9 +2,14 @@ package com.example.scfappv1.ui.addDiaryEntry;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.widget.TextViewCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -41,10 +46,12 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.scfappv1.BottomNav;
 import com.example.scfappv1.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -82,9 +89,11 @@ import java.util.Map;
 
 public class AddDiaryEntryFragment extends Fragment {
     private static final String TAG = "TestingMessage";
+    final Calendar myCalendar= Calendar.getInstance();
     public String title;
     public String desc;
     public Date today;
+    public String date;
     public MaterialButton rmv;
     public TextInputEditText titleField;
     public TextInputEditText descField;
@@ -100,6 +109,8 @@ public class AddDiaryEntryFragment extends Fragment {
     public String diaryDate;
     public String usrDiaryEntry;
     public String diaryEmail;
+    public MaterialButton dateBtn;
+    public TextView dateText;
 
     //Camera features
     private CameraDevice cameraDevice;
@@ -115,6 +126,10 @@ public class AddDiaryEntryFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Intent intent = getActivity().getIntent();
+        diaryEmail = intent.getStringExtra("diaryEmail");
+        usrDiaryEntry = intent.getStringExtra("diaryEntry");
+        diaryDate = intent.getStringExtra("diaryDate");
         //Setting up the camera features
         //Setting up the texture view
         textureView = getView().findViewById(R.id.textureView);
@@ -140,9 +155,12 @@ public class AddDiaryEntryFragment extends Fragment {
         captureButton = getView().findViewById(R.id.btnCapture);
         cancelButton = getView().findViewById(R.id.btnCancel);
 
+        //Getting the date fields
+        dateBtn = getView().findViewById(R.id.changeDate);
+        dateText = getView().findViewById(R.id.dateText);
+
+
         //Setting up the view for existing diary entries
-        //Getting intent
-        Intent intent = getActivity().getIntent();
         String diaryTitle = intent.getStringExtra("diaryTitle");
         if (diaryTitle.equals("")){
             //Setting entry fields
@@ -159,6 +177,8 @@ public class AddDiaryEntryFragment extends Fragment {
         rmv.setVisibility(View.GONE);
         imgTxt.setVisibility(View.GONE);
         camera.setVisibility(View.GONE);
+        dateBtn.setVisibility(View.GONE);
+        dateText.setVisibility(View.GONE);
 
         //Making new elements visible
         TextView sigView = getActivity().findViewById(R.id.sigText);
@@ -220,10 +240,9 @@ public class AddDiaryEntryFragment extends Fragment {
                                                 throw new RuntimeException(e);
                                             }
                                             Bitmap bitmap = BitmapFactory.decodeFile(localfile.getAbsolutePath());
-                                            Log.d(TAG, "HERE1");
                                             //Rotating the image as it comes in sideways
                                             Matrix matrix = new Matrix();
-                                            matrix.postRotate(90);
+                                            matrix.postRotate(180);
                                             Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                                             try{
                                                 postImgView.setImageBitmap(rotatedBitmap);
@@ -269,6 +288,8 @@ public class AddDiaryEntryFragment extends Fragment {
                     rmv.setVisibility(View.VISIBLE);
                     imgTxt.setVisibility(View.VISIBLE);
                     camera.setVisibility(View.VISIBLE);
+                    dateBtn.setVisibility(View.VISIBLE);
+                    dateText.setVisibility(View.VISIBLE);
 
                     //Reverting new elements to invisible
                     sigView.setVisibility(View.GONE);
@@ -289,17 +310,15 @@ public class AddDiaryEntryFragment extends Fragment {
                     addEntry();
                 }
             });
+
+            delEntry.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    deleteEntry();
+                    getActivity().onBackPressed();
+                }
+            });
         }
-
-        diaryEmail = intent.getStringExtra("diaryEmail");
-        usrDiaryEntry = intent.getStringExtra("diaryEntry");
-        diaryDate = intent.getStringExtra("diaryDate");
-
-        //Setting all intent values back to blank
-        intent.putExtra("diaryTitle", "");
-        intent.putExtra("diaryDesc", "");
-        intent.putExtra("diarySig", "");
-        intent.putExtra("diaryImgPath", "");
     }
 
     public void addEntry(){
@@ -316,7 +335,7 @@ public class AddDiaryEntryFragment extends Fragment {
             public void onClick(View view) {
                 imageFile.delete();
                 imgTxt.setTag("empty");
-                imgTxt.setText("No image taken");
+                imgTxt.setText("No image taken ");
             }
         });
 
@@ -351,6 +370,47 @@ public class AddDiaryEntryFragment extends Fragment {
                 captureImage();
             }
         });
+
+        //Getting the current date
+        Calendar cal = Calendar.getInstance();
+        today = cal.getTime();
+
+        //Formatting the date
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+        //Formatting the date for the database
+        SimpleDateFormat dbDf = new SimpleDateFormat("dd:MM:yyyy", Locale.getDefault());
+
+        //Setting the date to either tha passed through date or the current date
+        if (!diaryDate.equals("")){
+            dateText.setText(diaryDate.replace(":", "/"));
+            date = diaryDate;
+        }
+        else{
+            dateText.setText(df.format(today));
+            date = dbDf.format(today);
+        }
+
+        //Creating an on listener that activates once the user has picked another date
+        DatePickerDialog.OnDateSetListener datePicker =new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int day) {
+                //Sets the calendar to the selected date
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH,month);
+                myCalendar.set(Calendar.DAY_OF_MONTH,day);
+                //Sets the text to the new date
+                dateText.setText(df.format(myCalendar.getTime()));
+                date = dbDf.format(myCalendar.getTime());
+            }
+        };
+        //Setting the on click for the date to open the date picker
+        dateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DatePickerDialog(getActivity(),datePicker,myCalendar.get(Calendar.YEAR),myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
     }
 
     public void checkFilled(){
@@ -372,14 +432,6 @@ public class AddDiaryEntryFragment extends Fragment {
         newUserMap.put("title", title);
         newUserMap.put("desc", desc);
 
-        //Getting the current date
-        Calendar cal = Calendar.getInstance();
-        today = cal.getTime();
-
-        //Formatting the date to match the database
-        SimpleDateFormat df = new SimpleDateFormat("dd:MM:yyyy", Locale.getDefault());
-        String date = df.format(today).toString();
-
         //Connecting to the database
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -393,22 +445,22 @@ public class AddDiaryEntryFragment extends Fragment {
                 String docVal;
                 DocumentSnapshot document = task.getResult();
                 if (!document.exists()){
-                    createTempDoc(db, date);
+                    createTempDoc(db);
                 } else {
-                    getLatestDocVal(db, date, 1);
+                    getLatestDocVal(db, 1);
                 }
             }
         });
     }
 
-    public void createTempDoc(FirebaseFirestore db, String date){
+    public void createTempDoc(FirebaseFirestore db){
         //Creating a temp map to create the document folder
         Map<String, Object> newTempMap = new HashMap<>();
         //Creating a basic entry
         newTempMap.put("exists", true);
 
         //Making the directory
-        db.collection("diaryEnteries").document(date)
+        db.collection("diaryEntries").document(date)
                 .set(newTempMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
@@ -420,32 +472,37 @@ public class AddDiaryEntryFragment extends Fragment {
                         Log.d(TAG, "Temp not added successfully");
                     }
                 });
-        createNewEntry(db, date, "1");
+        createNewEntry(db, "1");
     }
 
-    public void getLatestDocVal(FirebaseFirestore db, String date, int diaryEntryInt){
+    public void getLatestDocVal(FirebaseFirestore db, int diaryEntryInt){
         String diaryEntry = Integer.toString(diaryEntryInt);
+
         //Getting the collection for the diary date
         CollectionReference diaryCollection = db.collection("diaryEntries").document(date).collection(diaryEntry);
+
         //Getting the data from the diary entry
         diaryCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                Log.w(TAG, "HERE1: " + diaryEntry);
-                if (!task.getResult().isEmpty() && !preExisted) {
-                    getLatestDocVal(db, date, diaryEntryInt+1);
+                Log.w(TAG, "HERE1: " + preExisted);
+                if (!task.getResult().isEmpty() && !date.equals(diaryDate)) {
+                    getLatestDocVal(db, diaryEntryInt+1);
+                } else if (preExisted) {
+                    createNewEntry(db, usrDiaryEntry);
                 } else {
-                    createNewEntry(db, date, diaryEntry);
+                    createNewEntry(db, diaryEntry);
                 }
             }
         });
     }
 
-    public void createNewEntry(FirebaseFirestore db, String date, String diaryEntry){
+    public void createNewEntry(FirebaseFirestore db, String diaryEntry){
         //Creating a temp map to create the document folder
         Map<String, Object> newMap = new HashMap<>();
         newMap.put("desc", desc);
         newMap.put("title", title);
+        newMap.put("deleted", false);
 
         //Getting the username for the signature as well as the email for the db
         Intent intent = getActivity().getIntent();
@@ -456,29 +513,29 @@ public class AddDiaryEntryFragment extends Fragment {
 
         //Getting the email
         String email = intent.getStringExtra("email");
+        if (preExisted){
+            email = diaryEmail;
+        }
+
+        if (!diaryDate.equals("") && diaryDate != date){
+            deleteEntry();
+        }
 
         //Adding the current timestamp
         Timestamp time = new Timestamp(today);
         newMap.put("time", time);
-
-        if (preExisted){
-            date = diaryDate;
-            email = diaryEmail;
-            diaryEntry = usrDiaryEntry;
-        }
 
         //Setting to db
         db.collection("diaryEntries").document(date).collection(diaryEntry).document(email)
                 .set(newMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Toast.makeText(getActivity(), "New entry added successfully.", Toast.LENGTH_SHORT).show();
-                        getActivity().onBackPressed();
+                        //Toast.makeText(getActivity().getApplicationContext(), "New entry added successfully.", Toast.LENGTH_SHORT).show();
                     }
                 }) .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "Temp not added successfully");
+                        Log.d(TAG, "Not added successfully");
                     }
                 });
 
@@ -506,7 +563,40 @@ public class AddDiaryEntryFragment extends Fragment {
                     }
                 }
             });
+        } else if (hasImage){
+            deleteImg();
         }
+        //Creating the users name for the notification
+        String name = (intent.getStringExtra("firstName") + " " + intent.getStringExtra("lastName"));
+        ((BottomNav)getActivity()).handleNotifications("New diary entry!","A new diary entry has been created by "+name+" about '"+title+"'.");
+        getActivity().onBackPressed();
+    }
+
+    public void deleteImg(){
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+        StorageReference childRef = storageRef.child("diary/diary_imgs/"+diaryDate+"/"+usrDiaryEntry+"/pfp.jpg");
+        childRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d(TAG, "Image deleted from database");
+            }
+        });
+    }
+
+    public void deleteEntry(){
+        Map<String, Object> delMap = new HashMap<>();
+        delMap.put("deleted", true);
+        //Connecting to the database
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("diaryEntries").document(diaryDate).collection(usrDiaryEntry).document(diaryEmail)
+                .update(delMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d(TAG, "Deleted entry!");
+                    }
+                });
+        Toast.makeText(getActivity().getApplicationContext(), "Deleted entry", Toast.LENGTH_SHORT);
     }
 
     private void reset(){

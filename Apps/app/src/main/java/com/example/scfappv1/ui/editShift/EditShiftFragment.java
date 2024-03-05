@@ -91,7 +91,7 @@ public class EditShiftFragment extends Fragment {
 
         //Getting email from intent
         Intent intent = getActivity().getIntent();
-        String email = intent.getStringExtra("email");
+        String email = intent.getStringExtra("viewEmail");
 
         //Lopping through all the icons and adding an on click method
         //This sets their colour and their active status
@@ -232,6 +232,7 @@ public class EditShiftFragment extends Fragment {
                             });
                 }
                 Toast.makeText(getActivity(), "Shifts set", Toast.LENGTH_SHORT).show();
+                intent.putExtra("viewing", true);
                 getActivity().onBackPressed();
             }
         });

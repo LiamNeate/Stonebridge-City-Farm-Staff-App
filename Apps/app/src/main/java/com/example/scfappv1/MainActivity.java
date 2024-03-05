@@ -2,6 +2,7 @@ package com.example.scfappv1;
 
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -10,6 +11,9 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
 
 import android.util.Log;
 import android.view.View;
@@ -28,6 +32,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,9 +61,43 @@ public class MainActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            String email = mAuth.getCurrentUser().getEmail();
-            setIntent(email);
+            if (isBiometricAvailable()){
+                showBiometricPrompt();
+            }
         }
+    }
+
+    private boolean isBiometricAvailable(){
+        BiometricManager biometricManager = BiometricManager.from(this);
+        return biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
+    }
+
+
+    private void showBiometricPrompt(){
+        Executor executor = getMainExecutor();
+        FragmentActivity activity = this;
+        MainActivity inst = this;
+
+        BiometricPrompt biometricPrompt = new BiometricPrompt(activity, executor,
+                new BiometricPrompt.AuthenticationCallback() {
+                    @Override
+                    public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result){
+                        super.onAuthenticationSucceeded(result);
+                        //Handle authentication success
+                        Toast.makeText(inst,"Logged in.", Toast.LENGTH_SHORT).show();
+                        String email = mAuth.getCurrentUser().getEmail();
+                        setIntent(email);
+                    }
+
+                });
+
+        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Biometric Authentication")
+                .setSubtitle("Use your fingerprint to authenticate")
+                .setNegativeButtonText("Cancel")
+                .build();
+
+        biometricPrompt.authenticate(promptInfo);
     }
 
     public void login(String email, String password){
@@ -113,12 +153,6 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra(adminStr, admin);
                         intent.putExtra(fNameStr, fName);
                         intent.putExtra(lNameStr, lName);
-                        //Setting some empty ones for diary entries later
-                        intent.putExtra("diaryTitle", "");
-                        intent.putExtra("diaryDesc", "");
-                        intent.putExtra("diarySig", "");
-                        intent.putExtra("diaryImgPath", "");
-                        intent.putExtra("diaryEmail", "");
                         startActivity(intent);
                     }
                     else{

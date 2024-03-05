@@ -34,7 +34,10 @@ import com.example.scfappv1.databinding.FragmentTeamBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.CollectionReference;
@@ -46,6 +49,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TeamFragment extends Fragment {
 
@@ -95,16 +100,16 @@ public class TeamFragment extends Fragment {
                 teamName.setText(team + " Team");
                 for (DocumentSnapshot item : queryDocumentSnapshots.getDocuments()){
 
-                        if (item.getData().get("team").toString().contains(team)){
+                        if (item.getData().get("team").toString().contains(team) && !item.getBoolean("deleted")){
                             // Getting the linear layout for the right role
                             LinearLayoutCompat linLayout;
                             String role = item.getData().get("role").toString();
                             if (role.contains("Manager")){
-                                linLayout = getView().findViewById(R.id.teamAdminLinLayout);
+                                linLayout = getView().findViewById(R.id.managerLin);
                             } else if (role.contains("Staff")) {
-                                linLayout = getView().findViewById(R.id.teamStaffLinLayout);
+                                linLayout = getView().findViewById(R.id.staffLin);
                             } else {
-                                linLayout = getView().findViewById(R.id.teamVolunteerLinLayout);
+                                linLayout = getView().findViewById(R.id.volunteerLin);
                             }
                             width = linLayout.getWidth();
 
@@ -176,6 +181,32 @@ public class TeamFragment extends Fragment {
                             removeParams.weight = 1.0f;
                             removeParams.gravity = Gravity.CENTER;
                             remove.setLayoutParams(removeParams);
+                            remove.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Map<String, Object> delMap = new HashMap<>();
+                                    delMap.put("deleted", true);
+                                    //Connecting to the database
+                                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                    db.collection("username").document(item.getId().toString())
+                                            .update(delMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                    Toast.makeText(getActivity(), "Deleted user", Toast.LENGTH_SHORT).show();
+
+                                                    LinearLayoutCompat managerLinLayout = getActivity().findViewById(R.id.managerLin);
+                                                    LinearLayoutCompat staffLinLayout = getActivity().findViewById(R.id.staffLin);
+                                                    LinearLayoutCompat volunteerLinLayout = getActivity().findViewById(R.id.volunteerLin);
+
+                                                    managerLinLayout.removeAllViews();
+                                                    staffLinLayout.removeAllViews();
+                                                    volunteerLinLayout.removeAllViews();
+
+                                                    loadData();
+                                                }
+                                            });
+                                }
+                            });
 
                             if (item.getId().toString().contains(email)){
                                 remove.getBackground().setTint(getActivity().getResources().getColor(R.color.button_greyed_out));
@@ -210,8 +241,6 @@ public class TeamFragment extends Fragment {
 
                             //Adding it all to the existing layout
                             linLayout.addView(newLineLayout);
-                        }
-                        else{
                         }
 
                 }
@@ -269,7 +298,6 @@ public class TeamFragment extends Fragment {
                                         Bitmap bitmap = BitmapFactory.decodeFile(localfile.getAbsolutePath());
                                         //Rotating the image as it comes in sideways
                                         Matrix matrix = new Matrix();
-                                        matrix.postRotate(270);
                                         matrix.postScale(-1, 1, bitmap.getWidth(), bitmap.getHeight());
                                         Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                                         try{

@@ -47,12 +47,20 @@
                     android:layout_height="1dp"
                     android:background="@android:color/darker_gray" />
 
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/managerLin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/teamStaffLinLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
                 android:paddingTop="10sp">
@@ -69,6 +77,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@android:color/darker_gray" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/staffLin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -92,6 +109,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@android:color/darker_gray" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/volunteerLin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
             <com.google.android.material.button.MaterialButton

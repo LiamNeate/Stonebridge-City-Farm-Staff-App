@@ -117,6 +117,27 @@
                 android:layout_marginBottom="20dp"
                 style="@style/Widget.MaterialComponents.Button.TextButton"/>
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/dateText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Date"
+                android:textAlignment="center"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/changeDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
+                android:text="Change date"
+                android:textColor="@color/button_dark_back"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/addUserBtn"
                 android:layout_width="wrap_content"

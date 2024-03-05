@@ -80,7 +80,6 @@ public class NotificationsFragment extends Fragment {
     public SimpleDateFormat dfText;
     public SimpleDateFormat dfCheck;
     public LinearLayoutCompat existingLin;
-    public String userFirst;
 
 private FragmentNotificationsBinding binding;
 
@@ -97,6 +96,17 @@ private FragmentNotificationsBinding binding;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
+        //Setting intent values to blank
+        //Used later when displaying entries
+        //Setting some empty ones for diary entries later
+        Intent intent = getActivity().getIntent();
+        intent.putExtra("diaryTitle", "");
+        intent.putExtra("diaryDesc", "");
+        intent.putExtra("diaryDate", "");
+        intent.putExtra("diarySig", "");
+        intent.putExtra("diaryImgPath", "");
+        intent.putExtra("diaryEmail", "");
+
         //Getting the current date
         Calendar cal = Calendar.getInstance();
         Date today = cal.getTime();
@@ -177,18 +187,21 @@ private FragmentNotificationsBinding binding;
                 Log.w(TAG, "HERE1: " + diaryEntry);
                 if (task.isSuccessful() && !task.getResult().isEmpty()) {
                     for (QueryDocumentSnapshot doc : task.getResult()) {
-                        //Collecting all the data
-                        String title = doc.getString("title");
-                        String desc = doc.getString("desc");
-                        //Timestamp time = doc.getTimestamp("time");
-                        String sig = doc.getString("sig");
-                        String email = doc.getId();
-                        String userFirstLetter = (doc.getString("sig")).substring(0, 1);
-                        //Getting the first letter of the users name for the user icon
-                        try{
-                            displayData(title, desc, sig, userFirstLetter, email, date, diaryEntry);
-                        } catch (Exception e){
-                            Log.w(TAG, "Error: ", e);
+                        Boolean deleted = doc.getBoolean("deleted");
+                        if (!deleted) {
+                            //Collecting all the data
+                            String title = doc.getString("title");
+                            String desc = doc.getString("desc");
+                            //Timestamp time = doc.getTimestamp("time");
+                            String sig = doc.getString("sig");
+                            String email = doc.getId();
+                            String userFirstLetter = (doc.getString("sig")).substring(0, 1);
+                            //Getting the first letter of the users name for the user icon
+                            try {
+                                displayData(title, desc, sig, userFirstLetter, email, date, diaryEntry);
+                            } catch (Exception e) {
+                                Log.w(TAG, "Error: ", e);
+                            }
                         }
                         getDiaryEntries(db, date, diaryEntryInt + 1);
                     }
@@ -344,7 +357,7 @@ private FragmentNotificationsBinding binding;
                                         Bitmap bitmap = BitmapFactory.decodeFile(localfile.getAbsolutePath());
                                         //Rotating the image as it comes in sideways
                                         Matrix matrix = new Matrix();
-                                        matrix.postRotate(90);
+                                        matrix.postRotate(180);
                                         Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                                         try{
                                             diaryPicViewCard.setVisibility(View.VISIBLE);

@@ -365,7 +365,6 @@ public class AccountFragment extends Fragment {
                                         Bitmap bitmap = BitmapFactory.decodeFile(localfile.getAbsolutePath());
                                         //Rotating the image as it comes in sideways
                                         Matrix matrix = new Matrix();
-                                        matrix.postRotate(270);
                                         matrix.postScale(-1, 1, bitmap.getWidth(), bitmap.getHeight());
                                         Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                                         try{

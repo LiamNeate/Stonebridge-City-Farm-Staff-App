@@ -47,7 +47,7 @@
     <fragment
         android:id="@+id/navigation_edit_shift"
         android:name="com.example.scfappv1.ui.editShift.EditShiftFragment"
-        android:label="@string/title_editShifts"
+        android:label="Edit"
         android:visibility="invisible"
         tools:layout="@layout/fragment_add_user" />
 

@@ -1,16 +1,21 @@
 package com.example.scfappv1;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -24,6 +29,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentManager;
 
@@ -45,6 +54,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.type.DateTime;
 
 import java.io.IOException;
@@ -87,6 +97,41 @@ public class BottomNav extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /*
+        //Setting up notifs from the lab
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ContextCompat.checkSelfPermission(BottomNav.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(BottomNav.this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+
+        CharSequence name = "Notification channel";
+        String description = "Notification description";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel channel = new NotificationChannel("app_channel", name, importance);
+        channel.setDescription(description);
+
+        //Register channel with system
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+         */
+
+        //Setting up firebase notifs
+        FirebaseMessaging.getInstance().subscribeToTopic("all");
+        getFirebaseCloudMessagingToken();
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { 
+            if (Build.VERSION.SDK_INT >= 33) {
+                if (ContextCompat.checkSelfPermission(BottomNav.this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(BottomNav.this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS},101);
+                } 
+            }
+            NotificationChannel channel = new NotificationChannel("firebase", "Firebase channel", NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager manager =
+                    getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+        }
+
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
 
@@ -114,6 +159,36 @@ public class BottomNav extends AppCompatActivity {
 
     }
 
+    //From the notifcations lab
+    public void handleNotifications(String title, String desc){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "app_channel")
+                .setSmallIcon(R.drawable.scf_logo)
+                .setContentTitle(title)
+                .setContentText(desc)
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
+
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED){
+            return;
+        } else {
+            notificationManagerCompat.notify(1, builder.build());
+        }
+    }
+
+    //Firebase notifs from lab
+    private void getFirebaseCloudMessagingToken(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null){
+                        String token = task.getResult();
+                        Log.d ("FCM Token", "Token: "+token);
+                    } else {
+                        Log.e("FCM Token", "Failed to get token");
+                    }
+                });
+    }
+
     //Setting up the NFC functionality of the home page
     //Done here as need access to intents
     public void setUpNFC() {
@@ -138,33 +213,37 @@ public class BottomNav extends AppCompatActivity {
         //Setting context for the NFC class
         context = this;
 
-
-        //Adding on click to open the nfc reader and remove current view
-        clockBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //NFC code
-                tvNFCContent.setText("");
-                reset();
-            }
-        });
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter == null) {
-            Toast.makeText(this, "This device does not support NFC", Toast.LENGTH_SHORT).show();
+            clockBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(context, "This device does not support NFC", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            //Adding on click to open the nfc reader and remove current view
+            clockBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //NFC code
+                    tvNFCContent.setText("");
+                    reset();
+                }
+            });
+            readFromIntent(getIntent());
+            pendingIntent = PendingIntent.getActivity(context, 0, new Intent(context, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_MUTABLE);
+            IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+            tagDetected.addCategory(Intent.CATEGORY_DEFAULT);
+            writingTagFilters = new IntentFilter[]{tagDetected};
+            //Adding on click to cancel button to get the original view back
+            cancelClock.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    reset();
+                }
+            });
         }
-
-        readFromIntent(getIntent());
-        pendingIntent = PendingIntent.getActivity(context, 0, new Intent(context, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-        IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-        tagDetected.addCategory(Intent.CATEGORY_DEFAULT);
-        writingTagFilters = new IntentFilter[]{tagDetected};
-        //Adding on click to cancel button to get the original view back
-        cancelClock.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                reset();
-            }
-        });
     }
 
     //Resetting the view and switching the boolean value.
@@ -346,13 +425,17 @@ public class BottomNav extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        nfcAdapter.disableForegroundDispatch(this);
+        if (nfcAdapter != null){
+            nfcAdapter.disableForegroundDispatch(this);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        nfcAdapter.enableForegroundDispatch(this, pendingIntent, writingTagFilters, null);
+        if (nfcAdapter != null) {
+            nfcAdapter.enableForegroundDispatch(this, pendingIntent, writingTagFilters, null);
+        }
     }
 
     @Override
