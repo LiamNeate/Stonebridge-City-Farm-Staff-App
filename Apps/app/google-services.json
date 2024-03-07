@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1093829852823",
+    "project_id": "scf-database",
+    "storage_bucket": "scf-database.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1093829852823:android:108435f4b029a27528b3d2",
+        "android_client_info": {
+          "package_name": "com.example.scfappv1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjyIf4H5Svg_BJACHUUgqOYd3o50OvfR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

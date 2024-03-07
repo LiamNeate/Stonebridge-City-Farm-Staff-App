@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Stonebridge City Farm Calendar App</string>
+    <string name="title_activity_bottom_nav">BottomNav</string>
+    <string name="title_home">Home</string>
+    <string name="title_calendar">Calendar</string>
+    <string name="title_diary">Diary</string>
+    <string name="title_team">Team</string>
+    <string name="title_acc">Account</string>
+    <string name="title_addUsr">Add User</string>
+    <string name="title_editShifts">Edit shifts</string>
+    <string name="title_addDiaryEntry">Entry</string>
+    <string name="user_placeholder">User</string>
+    <string name="load">Loading...</string>
+    <string-array name="user">
+        <item>Account</item>
+        <item>Login</item>
+    </string-array>
+</resources>
