@@ -1,16 +1,10 @@
 package com.example.scfappv1.ui.addDiaryEntry;
 
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.widget.TextViewCompat;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,7 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
-import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -40,7 +33,6 @@ import androidx.fragment.app.Fragment;
 import android.os.Environment;
 import android.util.Log;
 import android.util.Size;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -67,8 +59,6 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
@@ -124,6 +114,34 @@ public class AddDiaryEntryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_add_diary_entry, container, false);
+    }
+
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
     }
 
     @Override
@@ -204,6 +222,7 @@ public class AddDiaryEntryFragment extends Fragment {
         titleField.setText(intent.getStringExtra("diaryTitle"));
         descField.setText(intent.getStringExtra("diaryDesc"));
         sigView.setText("By "+intent.getStringExtra("diarySig"));
+        //Setting up a loading icon
         CircularProgressIndicator loadingCirc = getActivity().findViewById(R.id.loadingCirc);
 
         //Getting and setting the diary image if there is one
@@ -229,7 +248,6 @@ public class AddDiaryEntryFragment extends Fragment {
                     } else {
                         for (StorageReference item : listResult.getItems()) {
                             //Getting the name of the image and getting the path from that
-                            Log.d(TAG, imgLocation);
                             StorageReference storageReference = FirebaseStorage.getInstance().getReference(imgLocation + "/" + item.getName());
                             try {
                                 File localfile = File.createTempFile("tempfile", ".jpg");
@@ -276,6 +294,7 @@ public class AddDiaryEntryFragment extends Fragment {
                                 loadingCirc.setVisibility(View.GONE);
                                 throw new RuntimeException(e);
                             }
+                            //Adding a break as it should only go through once
                             break;
                         }
                     }
@@ -379,6 +398,7 @@ public class AddDiaryEntryFragment extends Fragment {
         captureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                verifyStoragePermissions(getActivity());
                 captureImage();
             }
         });
@@ -497,7 +517,6 @@ public class AddDiaryEntryFragment extends Fragment {
         diaryCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                Log.w(TAG, "HERE1: " + preExisted);
                 if (!task.getResult().isEmpty() && !date.equals(diaryDate)) {
                     getLatestDocVal(db, diaryEntryInt+1);
                 } else if (preExisted) {
@@ -557,7 +576,7 @@ public class AddDiaryEntryFragment extends Fragment {
             StorageReference storageRef = storage.getReference("diary/diary_imgs/" + date + "/" + diaryEntry);
             String filePath = downloadsDirectory.toString()+"/diaryImg.jpg";
             Uri file = Uri.fromFile(new File(filePath));
-            StorageReference pfpImagesRef = storageRef.child("pfp.jpg");
+            StorageReference pfpImagesRef = storageRef.child("diaryImg.jpg");
             UploadTask uploadTask = pfpImagesRef.putFile(file);
             uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override

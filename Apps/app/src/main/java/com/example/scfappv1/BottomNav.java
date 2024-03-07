@@ -9,12 +9,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.nfc.FormatException;
 import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-import android.nfc.tech.Ndef;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -34,9 +31,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
-import androidx.fragment.app.FragmentManager;
 
-import com.example.scfappv1.ui.home.HomeFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -53,19 +48,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.type.DateTime;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 public class BottomNav extends AppCompatActivity {
 
@@ -78,9 +69,6 @@ public class BottomNav extends AppCompatActivity {
     public TextView topText;
     public NestedScrollView currView;
     public LinearLayoutCompat nfcView;
-    public static final String Error_Detected = "No NFC tag detected";
-    public static final String Write_Success = "Text written successfully";
-    public static final String Write_Error = "Error during write";
     private static final String TAG = "TestingMessage";
 
     NfcAdapter nfcAdapter;
@@ -97,7 +85,7 @@ public class BottomNav extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /*
+
         //Setting up notifs from the lab
         if (Build.VERSION.SDK_INT >= 33) {
             if (ContextCompat.checkSelfPermission(BottomNav.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED){
@@ -114,7 +102,6 @@ public class BottomNav extends AppCompatActivity {
         //Register channel with system
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
-         */
 
         //Setting up firebase notifs
         FirebaseMessaging.getInstance().subscribeToTopic("all");
@@ -126,10 +113,10 @@ public class BottomNav extends AppCompatActivity {
                     ActivityCompat.requestPermissions(BottomNav.this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS},101);
                 } 
             }
-            NotificationChannel channel = new NotificationChannel("firebase", "Firebase channel", NotificationManager.IMPORTANCE_HIGH);
+            NotificationChannel notifsChannel = new NotificationChannel("firebase", "Firebase channel", NotificationManager.IMPORTANCE_HIGH);
             NotificationManager manager =
                     getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
+            manager.createNotificationChannel(notifsChannel);
         }
 
         mAuth = FirebaseAuth.getInstance();
@@ -147,8 +134,7 @@ public class BottomNav extends AppCompatActivity {
                 R.id.navigation_dashboard, R.id.navigation_notifications, R.id.navigation_home)
                 .build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_bottom_nav);
-        //TextView textView = (TextView) findViewById(R.id.dirText);
-        //textView.setText("Test");
+
         NavigationUI.setupWithNavController(binding.navView, navController);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
@@ -157,9 +143,11 @@ public class BottomNav extends AppCompatActivity {
         //Initialising the nfc reader
         setUpNFC();
 
+        verifyStoragePermissions(this);
+
     }
 
-    //From the notifcations lab
+    //From the notifications lab
     public void handleNotifications(String title, String desc){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "app_channel")
                 .setSmallIcon(R.drawable.scf_logo)
@@ -288,7 +276,6 @@ public class BottomNav extends AppCompatActivity {
                     DocumentSnapshot doc = task.getResult();
                     if (doc.exists()){
                         isClockedIn = doc.getBoolean("clockedIn");
-                        Log.d(TAG, "Checking bool: "+isClockedIn);
                     }
                 }
             }
@@ -301,6 +288,7 @@ public class BottomNav extends AppCompatActivity {
             date = date + "(in)";
         }
 
+
         //Creating the map and current timestamp
         Map<String, Object> newClockInfo = new HashMap<>();
         Date d = new Date();
@@ -310,15 +298,38 @@ public class BottomNav extends AppCompatActivity {
         Timestamp currTimestamp = new Timestamp(d);
         newClockInfo.put(email, currTimestamp);
 
-        //Adding the new clock to the db
-        db.collection("clocks").document(date)
-                .set(newClockInfo)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Log.d(TAG, "Clocked!");
+        docRef = db.collection("clocks").document(date);
+        String finalDate = date;
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    FieldPath field = FieldPath.of(email);
+                    DocumentSnapshot doc = task.getResult();
+                    if (doc.exists()){
+                        //updating if there is already an entry the new clock to the db
+                        db.collection("clocks").document(finalDate)
+                                .update(field, currTimestamp)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d(TAG, "Clocked!");
+                                    }
+                                });
+                    } else {
+                        //Creating the entry if there is none
+                        db.collection("clocks").document(finalDate)
+                                .set(newClockInfo)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d(TAG, "Clocked!");
+                                    }
+                                });
                     }
-                });
+                }
+            }
+        });
 
         //Updating clocked in info for the user
         db.collection("username").document(email)
@@ -404,11 +415,9 @@ public class BottomNav extends AppCompatActivity {
         if (msgs == null || msgs.length == 0) return;
 
         String text = "";
-        //String tagId = new String(msgs[0].getRecords()[0].getType();
         byte[] payload = msgs[0].getRecords()[0].getPayload();
         String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
         int languageCodeLength = payload[0] & 0063;
-        //String languageCode = new String(payload, 1, languageCodeLength, "US-ASCII");
 
         try{
             text = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
@@ -419,6 +428,34 @@ public class BottomNav extends AppCompatActivity {
         if (text.contains("SCFClockingSystem") && onClockPage){
             clockUser();
             reset();
+        }
+    }
+
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
         }
     }
 

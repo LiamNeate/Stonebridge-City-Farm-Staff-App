@@ -9,7 +9,7 @@ public class DashboardViewModel extends ViewModel {
 
     public DashboardViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is dashboard fragment");
+        mText.setValue("Calendar page to be done");
     }
 
     public LiveData<String> getText() {

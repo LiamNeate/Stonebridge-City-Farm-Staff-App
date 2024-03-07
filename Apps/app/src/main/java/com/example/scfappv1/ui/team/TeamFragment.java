@@ -1,7 +1,6 @@
 package com.example.scfappv1.ui.team;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -20,7 +19,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
@@ -31,13 +29,9 @@ import androidx.navigation.Navigation;
 
 import com.example.scfappv1.R;
 import com.example.scfappv1.databinding.FragmentTeamBinding;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.CollectionReference;
@@ -56,7 +50,6 @@ public class TeamFragment extends Fragment {
 
     private FragmentTeamBinding binding;
     private static final String TAG = "TestingMessage";
-    public String username;
     public String team;
     public String email;
     public StorageReference storageRef;
@@ -68,8 +61,6 @@ public class TeamFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        TeamViewModel teamViewModel =
-                new ViewModelProvider(this).get(TeamViewModel.class);
 
         binding = FragmentTeamBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -328,11 +319,6 @@ public class TeamFragment extends Fragment {
                 if (!imageFound){
                     profile.setBackgroundResource(R.drawable.noimgfoundblank);
                 }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                // Uh-oh, an error occurred!
             }
         });
     }

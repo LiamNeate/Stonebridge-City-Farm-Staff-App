@@ -2,15 +2,12 @@ package com.example.scfappv1.ui.editShift;
 
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -127,7 +124,6 @@ public class EditShiftFragment extends Fragment {
             icon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d(TAG, icon.getBackground().toString());
                     if (icon.getTag().toString().contains("inactive")){
                         icon.setBackground(getActivity().getDrawable(R.drawable.active_circle));
                         //Using the tag variable as it can hold the extra data

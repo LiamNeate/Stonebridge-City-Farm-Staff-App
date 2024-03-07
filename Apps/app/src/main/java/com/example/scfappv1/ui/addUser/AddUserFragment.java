@@ -1,29 +1,22 @@
 package com.example.scfappv1.ui.addUser;
 
 import android.content.Intent;
-import android.graphics.Point;
 import android.os.Bundle;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
-import com.example.scfappv1.AddUsr;
 import com.example.scfappv1.R;
 import com.example.scfappv1.databinding.FragmentAddUserBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -39,7 +32,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -68,8 +60,6 @@ public class AddUserFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        AddUserViewModel AddUserViewModel =
-                new ViewModelProvider(this).get(AddUserViewModel.class);
 
         binding = FragmentAddUserBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -209,7 +199,6 @@ public class AddUserFragment extends Fragment {
             Toast.makeText(getActivity(), password +":"+confPassword, Toast.LENGTH_SHORT).show();
         }
         else {
-            Log.d(TAG, "Name:" + fName + " " + sName + " Email:" + email + " Role:" + role + " Team:" + team);
             //Formatting the date
             int dobDay = dobPicker.getDayOfMonth();
             int dobMonth = dobPicker.getMonth();
@@ -220,7 +209,6 @@ public class AddUserFragment extends Fragment {
             //Setting date to a string the converting to a date.
             //Wrapping in a try catch as error could be thrown due to null date.
             String dobDate = dobYear + "/" + dobMonth + "/" + dobDay + " 00:00:00";
-            Log.w(TAG, "DOB TEST: "+dobDate);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             try {
                 Date date = sdf.parse(dobDate);

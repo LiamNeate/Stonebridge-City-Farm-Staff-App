@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.NFC"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
@@ -31,19 +33,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SCFAppV1"
-        tools:targetApi="31"
+        tools:targetApi="28"
+        android:requestLegacyExternalStorage="true"
         >
         <activity
             android:name=".BottomNav"
             android:screenOrientation="portrait"
             android:exported="false"
             android:label="@string/title_activity_bottom_nav" />
-        <activity
-            android:name=".AddUsr"
-            android:exported="false" />
-        <activity
-            android:name=".HomePage"
-            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"

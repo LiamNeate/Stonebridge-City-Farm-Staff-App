@@ -33,7 +33,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -43,9 +42,6 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
@@ -59,7 +55,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -75,16 +70,11 @@ import com.google.firebase.storage.UploadTask;
 import android.graphics.Bitmap;
 import android.widget.Toast;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 
 public class AccountFragment extends Fragment {
@@ -111,9 +101,8 @@ public class AccountFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        AccountViewModel accountViewModel =
-                new ViewModelProvider(this).get(AccountViewModel.class);
 
+        //Setting up the values from the intent in case the user is viewing someone elses account
         binding = FragmentAccountBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         intent = getActivity().getIntent();
@@ -230,6 +219,7 @@ public class AccountFragment extends Fragment {
         if (viewingOtherUser){
             chngPass.setVisibility(View.GONE);
         }
+
         //Setting the change password layout to have an alpha of 0 for the animation to work
         chngPwdLayout.animate().alpha(0.0f);
 
@@ -402,11 +392,6 @@ public class AccountFragment extends Fragment {
                     }
                 }
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                // Uh-oh, an error occurred!
-            }
         });
     }
 
@@ -444,12 +429,8 @@ public class AccountFragment extends Fragment {
                                 field.setText(document.getString("firstName") + " " + document.getString("lastName"));
                                 break;
                             default:
-                                //Log.d(TAG, fileName);
                                 field.setText(document.getString(fileName));
                         }
-                    }
-                    else{
-                        Log.d(TAG, "uh oh");
                     }
                 }else{
                     Log.d(TAG, "get failed with ", task.getException());
